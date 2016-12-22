@@ -3,6 +3,9 @@ var windowsScan = require('./windows-scan.js').scanWifi;
 var linuxConnect = require('./linux-connect');
 var linuxDisconnect = require('./linux-disconnect');
 var linuxScan = require('./linux-scan.js').scanWifi;
+var raspiConnect = require('./raspi-connect');
+var raspiDisconnect = require('./raspi-disconnect');
+var raspiScan = require('./raspi-scan.js').scanWifi;
 var macConnect = require('./mac-connect.js').connectToWifi;
 var macScan = require('./mac-scan.js').scanWifi;
 
@@ -32,9 +35,18 @@ function init(options) {
 
     switch(process.platform) {
         case "linux":
-            connect = linuxConnect(config);
-            scan = linuxScan(config);
-            disconnect = linuxDisconnect(config);
+            switch(process.arch) {
+                case "arm":
+                    connect = raspiConnect(config);
+                    scan = raspiScan(config);
+                    disconnect = raspiDisconnect(config);
+                    break;
+                default:
+                    connect = linuxConnect(config);
+                    scan = linuxScan(config);
+                    disconnect = linuxDisconnect(config);
+                    break;
+            }
             break;
         case "darwin":
             connect = macConnect(config);
